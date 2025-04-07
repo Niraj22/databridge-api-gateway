@@ -1,0 +1,17 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("MAX_THREADS") { 5 } %>
+  url: <%= ENV['DATABASE_URL'] %>
+
+development:
+  <<: *default
+  database: databridge_api_gateway_development
+
+test:
+  <<: *default
+  database: databridge_api_gateway_test
+
+production:
+  <<: *default
+  database: databridge_api_gateway_production

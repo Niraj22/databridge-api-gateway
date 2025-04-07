@@ -1,0 +1,53 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: databridge_api_gateway_development
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:6
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+  api_gateway:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/app
+      - gem_cache:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/databridge_api_gateway_development
+      REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
+      JWT_SECRET_KEY: development_secret_key
+      CUSTOMER_SERVICE_URL: http://customer_service:3001
+      ORDER_SERVICE_URL: http://order_service:3002
+      PRODUCT_SERVICE_URL: http://product_service:3003
+      ANALYTICS_SERVICE_URL: http://analytics_service:3004
+      PORT: 3000
+      RAILS_LOG_TO_STDOUT: "true"
+      RAILS_SERVE_STATIC_FILES: "true"
+      REDIS_CACHE_URL: redis://redis:6379/1
+      MAX_THREADS: 5
+      WEB_CONCURRENCY: 2
+
+volumes:
+  postgres_data:
+  redis_data:
+  gem_cache:
