@@ -54,12 +54,11 @@ The API Gateway is built using Ruby on Rails in API-only mode, implementing an e
 
 ### Configuration
 
-🔐 Key configuration is managed through Rails credentials:
-	•	jwt_secret_key: Secret for JWT token generation/validation
-	•	service_registry.customer: URL for the Customer Service
-	•	service_registry.order: URL for the Order Service
-	•	service_registry.product: URL for the Product Service
-	•	service_registry.analytics: URL for the Analytics Service
+- `jwt_secret_key`: Secret for JWT token generation/validation  
+- `service_registry.customer`: URL for the Customer Service  
+- `service_registry.order`: URL for the Order Service  
+- `service_registry.product`: URL for the Product Service  
+- `service_registry.analytics`: URL for the Analytics Service  
 
 ## API Documentation
 
