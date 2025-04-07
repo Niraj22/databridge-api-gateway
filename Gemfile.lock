@@ -1,5 +1,5 @@
 PATH
-  remote: ../databridge_shared
+  remote: databridge_shared
   specs:
     databridge_shared (0.1.0)
       avro_turf (~> 1.18)

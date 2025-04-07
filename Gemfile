@@ -57,7 +57,7 @@ gem "redis", "~> 5.4"
 gem "rswag", "~> 2.16"
 
 gem "rspec-rails", "~> 7.1", :groups => [:development, :test]
-gem 'databridge_shared', path: '../databridge_shared'
+gem 'databridge_shared', path: './databridge_shared'
 
 gem "rswag-api", "~> 2.16"
 gem "rswag-ui", "~> 2.16"
