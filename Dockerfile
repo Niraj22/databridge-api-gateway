@@ -21,11 +21,11 @@ FROM base as build
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev libvips pkg-config
 
-# Create directory for databridge_shared
-RUN mkdir -p /databridge_shared
+# Create directory for databridge_shared in the expected location
+RUN mkdir -p /rails/databridge_shared
 
 # Copy the databridge_shared code first (assuming it's in a subdirectory of your build context)
-COPY databridge_shared /databridge_shared
+COPY databridge_shared /rails/databridge_shared
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -48,14 +48,14 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl libvips postgresql-client git && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# Create directory for databridge_shared in the final image
-RUN mkdir -p /databridge_shared
+# Create directory for databridge_shared in the expected location
+RUN mkdir -p /rails/databridge_shared
 
 # Copy databridge_shared to the final image
-COPY --from=build /databridge_shared /databridge_shared
+COPY --from=build /rails/databridge_shared /rails/databridge_shared
 
 # Initialize empty git repository in databridge_shared to support git commands in gemspec
-RUN cd /databridge_shared && git init
+RUN cd /rails/databridge_shared && git init
 
 # Copy built artifacts: gems, application
 COPY --from=build /usr/local/bundle /usr/local/bundle
@@ -63,7 +63,7 @@ COPY --from=build /rails /rails
 
 # Run and own only the runtime files as a non-root user for security
 RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp /databridge_shared
+    chown -R rails:rails db log storage tmp /rails/databridge_shared
 USER rails:rails
 
 # Entrypoint prepares the database.
