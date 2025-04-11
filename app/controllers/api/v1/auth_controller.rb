@@ -1,23 +1,17 @@
 module Api
   module V1
-    class AuthController < ApplicationController
+    class AuthController < Api::BaseController
       skip_before_action :authenticate_request, only: [:login, :register]
       
       def login
         client = CustomerServiceClient.new
         
         begin
-          user = client.authenticate(params[:email], params[:password])
-          token = generate_token(user)
+          user_data = client.authenticate(params[:email], params[:password])
+          token = generate_token(user_data)
           
-          event_publisher = DataBridgeShared::Clients::EventPublisher.new
-          event_publisher.publish('user.login.success', { user_id: user['id'], timestamp: Time.now.iso8601 })
-          
-          render json: { token: token, user: user }
+          render json: { token: token, user: user_data }
         rescue ServiceClient::UnauthorizedError
-          event_publisher = DataBridgeShared::Clients::EventPublisher.new
-          event_publisher.publish('user.login.failed', { email: params[:email], timestamp: Time.now.iso8601 })
-          
           render json: { error: 'Invalid credentials' }, status: :unauthorized
         end
       end
@@ -26,7 +20,7 @@ module Api
         client = CustomerServiceClient.new
         
         begin
-          user = client.create_user(user_params)
+          user = client.register(user_params)
           token = generate_token(user)
           
           render json: { token: token, user: user }, status: :created
@@ -42,18 +36,19 @@ module Api
       private
       
       def generate_token(user)
+        user = user['user'] || user
         payload = {
           user_id: user['id'],
           email: user['email'],
-          roles: user['roles'],
+          role: user['role'],
           exp: Time.now.to_i + JwtConfig.token_expiry
         }
         
         DataBridgeShared::Auth::JwtHelper.encode(payload, JwtConfig.secret_key)
       end
-      
+
       def user_params
-        params.permit(:email, :password, :name, :role)
+        params.require(:auth).permit(:email, :password, :name, :role)
       end
     end
   end

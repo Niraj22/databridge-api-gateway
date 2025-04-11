@@ -1,7 +1,7 @@
 module Api
   module V1
     class ProductsController < BaseController
-      # Allow public access to index and show actions
+      before_action :authorize_admin, only: [:create, :update, :destroy]
       skip_before_action :authenticate_request, only: [:index, :show]
       
       def index
@@ -16,7 +16,7 @@ module Api
         client = ProductServiceClient.new
         product = client.get_product(params[:id])
         render json: product
-      rescue ServiceClient::ResourceNotFoundError
+      rescue ServiceClient::ResourceNotFoundError => e
         render json: { error: 'Product not found' }, status: :not_found
       rescue ServiceClient::ServiceError => e
         render json: { error: e.message }, status: :internal_server_error
@@ -34,7 +34,7 @@ module Api
         client = ProductServiceClient.new
         product = client.update_product(params[:id], product_params)
         render json: product
-      rescue ServiceClient::ResourceNotFoundError
+      rescue ServiceClient::ResourceNotFoundError => e
         render json: { error: 'Product not found' }, status: :not_found
       rescue ServiceClient::ServiceError => e
         render json: { error: e.message }, status: :unprocessable_entity
@@ -44,7 +44,7 @@ module Api
         client = ProductServiceClient.new
         client.delete_product(params[:id])
         head :no_content
-      rescue ServiceClient::ResourceNotFoundError
+      rescue ServiceClient::ResourceNotFoundError => e
         render json: { error: 'Product not found' }, status: :not_found
       rescue ServiceClient::ServiceError => e
         render json: { error: e.message }, status: :internal_server_error
@@ -53,11 +53,17 @@ module Api
       private
       
       def product_params
-        params.permit(:name, :description, :price, :category_id, :inventory_count, :active)
+        params.permit(:name, :description, :sku, :price, :active)
       end
       
       def filter_params
-        params.permit(:page, :per_page, :category, :sort_by, :sort_direction, :min_price, :max_price)
+        params.permit(:page, :per_page, :category_id, :price_min, :price_max, :sort_by, :sort_direction, :include_inactive)
+      end
+      
+      def authorize_admin
+        unless current_user && (current_user['role'].include?('admin') || current_user['role'].include?('product_manager'))
+          render json: { error: 'Unauthorized' }, status: :forbidden
+        end
       end
     end
   end

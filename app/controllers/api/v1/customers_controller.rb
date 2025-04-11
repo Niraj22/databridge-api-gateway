@@ -1,4 +1,3 @@
-# app/controllers/api/v1/customers_controller.rb
 module Api
   module V1
     class CustomersController < BaseController
@@ -12,7 +11,7 @@ module Api
       
       def show
         client = CustomerServiceClient.new
-        customer = client.get_user(params[:id])
+        customer = client.get_customer(params[:id])
         render json: customer
       rescue ServiceClient::ResourceNotFoundError
         render json: { error: 'Customer not found' }, status: :not_found
@@ -22,7 +21,7 @@ module Api
       
       def create
         client = CustomerServiceClient.new
-        customer = client.create_user(customer_params)
+        customer = client.create_customer(customer_params)
         render json: customer, status: :created
       rescue ServiceClient::ServiceError => e
         render json: { error: e.message }, status: :unprocessable_entity
@@ -30,7 +29,7 @@ module Api
       
       def update
         client = CustomerServiceClient.new
-        customer = client.update_user(params[:id], customer_params)
+        customer = client.update_customer(params[:id], customer_params)
         render json: customer
       rescue ServiceClient::ResourceNotFoundError
         render json: { error: 'Customer not found' }, status: :not_found
@@ -40,7 +39,7 @@ module Api
       
       def destroy
         client = CustomerServiceClient.new
-        client.delete_user(params[:id])
+        client.delete_customer(params[:id])
         head :no_content
       rescue ServiceClient::ResourceNotFoundError
         render json: { error: 'Customer not found' }, status: :not_found

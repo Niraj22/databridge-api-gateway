@@ -1,6 +1,5 @@
-# app/controllers/api/base_controller.rb
 module Api
-  class BaseController < ApplicationController
+  class BaseController < ::ApplicationController
     before_action :authenticate_request
     
     private

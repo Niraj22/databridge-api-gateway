@@ -62,3 +62,4 @@ gem 'databridge_shared', path: './databridge_shared'
 gem "rswag-api", "~> 2.16"
 gem "rswag-ui", "~> 2.16"
 gem "rswag-specs", "~> 2.16"
+gem 'request_store'

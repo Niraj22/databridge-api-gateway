@@ -32,10 +32,37 @@ class Authentication
   end
   
   def decode_token(token)
-    # Use JWT to decode the token
-    # In a real app, you would use the JwtConfig or DataBridgeShared::Auth::JwtHelper
-    
-    # For now, just return a dummy payload to allow the app to boot
-    { 'user_id' => '123', 'email' => 'test@example.com', 'roles' => ['user'] }
+    begin
+      # Decode the JWT token using the shared JWT helper
+      decoded_token = DataBridgeShared::Auth::JwtHelper.decode(token, JwtConfig.secret_key)
+      
+      # The JWT.decode method returns an array with [payload, header]
+      # We only need the payload (first element)
+      payload = decoded_token.first
+      
+      # Perform additional validations if needed
+      if Time.now.to_i > payload['exp'].to_i
+        Rails.logger.warn "Token expired"
+        return nil
+      end
+      
+      # You could add more custom validations here:
+      # - Check if the user exists in the database (though this would make it stateful)
+      # - Verify specific claims like issuer (iss) or audience (aud)
+      # - Check if the token is in a blocklist
+      
+      return payload
+    rescue JWT::DecodeError => e
+      # This catches various JWT-specific errors like:
+      # - Invalid signature
+      # - Claim validation failures
+      # - Malformed tokens
+      Rails.logger.warn "JWT decode error: #{e.message}"
+      return nil
+    rescue StandardError => e
+      # Catch any other unexpected errors
+      Rails.logger.error "Unexpected error decoding token: #{e.message}"
+      return nil
+    end
   end
 end

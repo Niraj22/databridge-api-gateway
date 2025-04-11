@@ -17,66 +17,263 @@ components:
         error:
           type: string
 paths:
-  "/api/v1/analytics/dashboard":
+  "/api/v1/customers/{customer_id}/addresses":
+    parameters:
+    - name: customer_id
+      in: path
+      description: Customer ID
+      required: true
+      schema:
+        type: string
     get:
-      summary: Gets dashboard data
+      summary: list addresses
       tags:
-      - Analytics
+      - Addresses
       security:
       - bearer_auth: []
       responses:
         '200':
-          description: dashboard data found
+          description: addresses found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    customer_id:
+                      type: integer
+                    address_type:
+                      type: string
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    state:
+                      type: string
+                      nullable: true
+                    postal_code:
+                      type: string
+                    country:
+                      type: string
+                    is_default:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
         '401':
           description: unauthorized
-  "/api/v1/analytics/reports":
-    get:
-      summary: Gets analytics reports
+        '404':
+          description: customer not found
+    post:
+      summary: create address
       tags:
-      - Analytics
+      - Addresses
       security:
       - bearer_auth: []
-      parameters:
-      - name: report_type
-        in: query
-        required: true
-        enum:
-        - sales
-        - orders
-        - products
-        - customers
-        schema:
-          type: string
-        description: ":\n * `sales` \n * `orders` \n * `products` \n * `customers`
-          \n "
-      - name: start_date
-        in: query
-        format: date
-        required: true
-        schema:
-          type: string
-      - name: end_date
-        in: query
-        format: date
-        required: true
-        schema:
-          type: string
-      - name: granularity
-        in: query
-        required: false
-        enum:
-        - day
-        - week
-        - month
-        schema:
-          type: string
+      parameters: []
       responses:
-        '200':
-          description: report data found
+        '201':
+          description: address created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  address_type:
+                    type: string
+                  street:
+                    type: string
+                  city:
+                    type: string
+                  state:
+                    type: string
+                    nullable: true
+                  postal_code:
+                    type: string
+                  country:
+                    type: string
+                  is_default:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
         '401':
           description: unauthorized
         '422':
           description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address_type:
+                  type: string
+                  enum:
+                  - shipping
+                  - billing
+                street:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                postal_code:
+                  type: string
+                country:
+                  type: string
+                is_default:
+                  type: boolean
+              required:
+              - address_type
+              - street
+              - city
+              - postal_code
+              - country
+  "/api/v1/customers/{customer_id}/addresses/{id}":
+    parameters:
+    - name: customer_id
+      in: path
+      description: Customer ID
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Address ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show address
+      tags:
+      - Addresses
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: address found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  address_type:
+                    type: string
+                  street:
+                    type: string
+                  city:
+                    type: string
+                  state:
+                    type: string
+                    nullable: true
+                  postal_code:
+                    type: string
+                  country:
+                    type: string
+                  is_default:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: address not found
+    put:
+      summary: update address
+      tags:
+      - Addresses
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: address updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  address_type:
+                    type: string
+                  street:
+                    type: string
+                  city:
+                    type: string
+                  state:
+                    type: string
+                    nullable: true
+                  postal_code:
+                    type: string
+                  country:
+                    type: string
+                  is_default:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: address not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address_type:
+                  type: string
+                  enum:
+                  - shipping
+                  - billing
+                street:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                postal_code:
+                  type: string
+                country:
+                  type: string
+                is_default:
+                  type: boolean
+    delete:
+      summary: delete address
+      tags:
+      - Addresses
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: address deleted
+        '404':
+          description: address not found
   "/api/v1/auth/login":
     post:
       summary: Authenticates user
@@ -145,6 +342,227 @@ paths:
           description: token refreshed
         '401':
           description: unauthorized
+  "/api/v1/categories":
+    get:
+      summary: Lists all categories
+      tags:
+      - Categories
+      parameters:
+      - name: include_inactive
+        in: query
+        required: false
+        description: Include inactive categories
+        schema:
+          type: boolean
+      - name: parent_id
+        in: query
+        required: false
+        description: Filter by parent category
+        schema:
+          type: integer
+      - name: root
+        in: query
+        required: false
+        description: Only return root categories
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: categories found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    description:
+                      type: string
+                      nullable: true
+                    parent_id:
+                      type: integer
+                      nullable: true
+                    active:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+    post:
+      summary: Creates a category
+      tags:
+      - Categories
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: category created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  parent_id:
+                    type: integer
+                    nullable: true
+                  active:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                parent_id:
+                  type: integer
+                  nullable: true
+                active:
+                  type: boolean
+              required:
+              - name
+  "/api/v1/categories/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Category ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieves a category
+      tags:
+      - Categories
+      responses:
+        '200':
+          description: category found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  parent_id:
+                    type: integer
+                    nullable: true
+                  active:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  subcategories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        description:
+                          type: string
+                          nullable: true
+                        parent_id:
+                          type: integer
+                        active:
+                          type: boolean
+        '404':
+          description: category not found
+    put:
+      summary: Updates a category
+      tags:
+      - Categories
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: category updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  parent_id:
+                    type: integer
+                    nullable: true
+                  active:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: category not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                parent_id:
+                  type: integer
+                  nullable: true
+                active:
+                  type: boolean
+    delete:
+      summary: Deletes a category
+      tags:
+      - Categories
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: category deleted
+        '404':
+          description: category not found
   "/api/v1/customers":
     get:
       summary: Lists customers
@@ -263,32 +681,182 @@ paths:
           description: customer deleted
         '404':
           description: customer not found
-  "/api/v1/orders":
+  "/api/v1/products/{product_id}/inventory":
+    parameters:
+    - name: product_id
+      in: path
+      description: Product ID
+      required: true
+      schema:
+        type: integer
     get:
-      summary: Lists orders
+      summary: Retrieves product inventory
       tags:
-      - Orders
+      - Inventories
       security:
       - bearer_auth: []
+      responses:
+        '200':
+          description: inventory found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  product_id:
+                    type: integer
+                  quantity:
+                    type: integer
+                  low_stock_threshold:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: product not found
+    put:
+      summary: Updates product inventory
+      tags:
+      - Inventories
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: inventory updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  product_id:
+                    type: integer
+                  quantity:
+                    type: integer
+                  low_stock_threshold:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                low_stock_threshold:
+                  type: integer
+              required:
+              - quantity
+  "/api/v1/inventories/batch":
+    post:
+      summary: Batch updates multiple product inventories
+      tags:
+      - Inventories
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: batch update successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product_id:
+                          type: integer
+                        quantity:
+                          type: integer
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inventories:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product_id:
+                        type: integer
+                      quantity:
+                        type: integer
+                    required:
+                    - product_id
+                    - quantity
+              required:
+              - inventories
+  "/api/v1/orders":
+    get:
+      summary: Lists all orders
+      tags:
+      - Orders
       parameters:
       - name: page
         in: query
         required: false
+        description: Page number
         schema:
           type: integer
       - name: per_page
         in: query
         required: false
+        description: Items per page
         schema:
           type: integer
       - name: status
         in: query
         required: false
+        description: Filter by status (created, processing, fulfilled, canceled)
+        schema:
+          type: string
+      - name: customer_id
+        in: query
+        required: false
+        description: Filter by customer ID
+        schema:
+          type: integer
+      - name: start_date
+        in: query
+        format: date
+        required: false
+        description: Filter by start date (YYYY-MM-DD)
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        format: date
+        required: false
+        description: Filter by end date (YYYY-MM-DD)
         schema:
           type: string
       - name: sort_by
         in: query
         required: false
+        description: Field to sort by (created_at, total_amount, status)
         schema:
           type: string
       - name: sort_direction
@@ -297,26 +865,50 @@ paths:
         enum:
         - asc
         - desc
+        description: "Sort direction:\n * `asc` \n * `desc` \n "
         schema:
           type: string
-        description: ":\n * `asc` \n * `desc` \n "
-      - name: start_date
-        in: query
-        format: date
-        required: false
-        schema:
-          type: string
-      - name: end_date
-        in: query
-        format: date
-        required: false
-        schema:
-          type: string
+      security:
+      - bearer_auth: []
       responses:
         '200':
           description: orders found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    customer_id:
+                      type: integer
+                    status:
+                      type: string
+                      enum:
+                      - created
+                      - processing
+                      - fulfilled
+                      - canceled
+                    total_amount:
+                      type: number
+                      format: float
+                    notes:
+                      type: string
+                      nullable: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
         '401':
           description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
     post:
       summary: Creates an order
       tags:
@@ -327,8 +919,545 @@ paths:
       responses:
         '201':
           description: order created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  status:
+                    type: string
+                  total_amount:
+                    type: number
+                    format: float
+                  notes:
+                    type: string
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
         '401':
           description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                line_items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product_id:
+                        type: integer
+                      quantity:
+                        type: integer
+                      unit_price:
+                        type: number
+                        format: float
+                    required:
+                    - product_id
+                    - quantity
+                    - unit_price
+              required:
+              - line_items
+  "/api/v1/orders/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Order ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieves an order
+      tags:
+      - Orders
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: order found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  status:
+                    type: string
+                  total_amount:
+                    type: number
+                    format: float
+                  notes:
+                    type: string
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  line_items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        order_id:
+                          type: integer
+                        product_id:
+                          type: integer
+                        quantity:
+                          type: integer
+                        unit_price:
+                          type: number
+                          format: float
+                        total_price:
+                          type: number
+                          format: float
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+                  payments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        order_id:
+                          type: integer
+                        amount:
+                          type: number
+                          format: float
+                        payment_method:
+                          type: string
+                        status:
+                          type: string
+                        transaction_id:
+                          type: string
+                          nullable: true
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+                  shipments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        order_id:
+                          type: integer
+                        tracking_number:
+                          type: string
+                          nullable: true
+                        carrier:
+                          type: string
+                          nullable: true
+                        status:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+        '404':
+          description: order not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+    put:
+      summary: Updates an order
+      tags:
+      - Orders
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: order updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  status:
+                    type: string
+                  total_amount:
+                    type: number
+                    format: float
+                  notes:
+                    type: string
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: order not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - created
+                  - processing
+                  - fulfilled
+                  - canceled
+    delete:
+      summary: Cancels an order
+      tags:
+      - Orders
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: order canceled
+        '404':
+          description: order not found
+        '401':
+          description: unauthorized
+  "/api/v1/orders/{order_id}/payments":
+    parameters:
+    - name: order_id
+      in: path
+      description: Order ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Lists all payments for an order
+      tags:
+      - Payments
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: payments found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    order_id:
+                      type: integer
+                    amount:
+                      type: number
+                      format: float
+                    payment_method:
+                      type: string
+                      enum:
+                      - credit_card
+                      - paypal
+                      - bank_transfer
+                    status:
+                      type: string
+                      enum:
+                      - pending
+                      - completed
+                      - failed
+                    transaction_id:
+                      type: string
+                      nullable: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+        '404':
+          description: order not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+    post:
+      summary: Creates a payment for an order
+      tags:
+      - Payments
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: payment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  order_id:
+                    type: integer
+                  amount:
+                    type: number
+                    format: float
+                  payment_method:
+                    type: string
+                    enum:
+                    - credit_card
+                    - paypal
+                    - bank_transfer
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - completed
+                    - failed
+                  transaction_id:
+                    type: string
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: order not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: float
+                payment_method:
+                  type: string
+                  enum:
+                  - credit_card
+                  - paypal
+                  - bank_transfer
+                status:
+                  type: string
+                  enum:
+                  - pending
+                  - completed
+                  - failed
+                transaction_id:
+                  type: string
+                  nullable: true
+              required:
+              - amount
+              - payment_method
+  "/api/v1/customers/{customer_id}/preferences":
+    parameters:
+    - name: customer_id
+      in: path
+      description: Customer ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list preferences
+      tags:
+      - Preferences
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: preferences found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    customer_id:
+                      type: integer
+                    key:
+                      type: string
+                    value:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+        '401':
+          description: unauthorized
+        '404':
+          description: customer not found
+  "/api/v1/customers/{customer_id}/preferences/{id}":
+    parameters:
+    - name: customer_id
+      in: path
+      description: Customer ID
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Preference key
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show preference
+      tags:
+      - Preferences
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: preference found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  key:
+                    type: string
+                  value:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: preference not found
+    put:
+      summary: update preference
+      tags:
+      - Preferences
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: preference updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  customer_id:
+                    type: integer
+                  key:
+                    type: string
+                  value:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: customer not found
         '422':
           description: invalid request
       requestBody:
@@ -337,84 +1466,105 @@ paths:
             schema:
               type: object
               properties:
-                products:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      product_id:
-                        type: string
-                      quantity:
-                        type: integer
-                shipping_address:
-                  type: object
-                  properties:
-                    street:
-                      type: string
-                    city:
-                      type: string
-                    state:
-                      type: string
-                    zip:
-                      type: string
-                    country:
-                      type: string
-                payment_method:
-                  type: string
-                notes:
+                value:
                   type: string
               required:
-              - products
-              - shipping_address
-              - payment_method
+              - value
+    delete:
+      summary: delete preference
+      tags:
+      - Preferences
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: preference deleted
+        '404':
+          description: preference not found
   "/api/v1/products":
     get:
-      summary: Lists products
+      summary: Lists all products
       tags:
       - Products
       parameters:
       - name: page
         in: query
         required: false
+        description: Page number
         schema:
           type: integer
       - name: per_page
         in: query
         required: false
+        description: Items per page
         schema:
           type: integer
-      - name: category
+      - name: category_id
         in: query
         required: false
+        description: Filter by category
         schema:
-          type: string
+          type: integer
+      - name: price_min
+        in: query
+        required: false
+        description: Minimum price
+        schema:
+          type: number
+      - name: price_max
+        in: query
+        required: false
+        description: Maximum price
+        schema:
+          type: number
       - name: sort_by
         in: query
         required: false
+        description: Field to sort by
         schema:
           type: string
       - name: sort_direction
         in: query
         required: false
-        enum:
-        - asc
-        - desc
+        description: Sort direction (asc or desc)
         schema:
           type: string
-        description: ":\n * `asc` \n * `desc` \n "
-      - name: min_price
+      - name: include_inactive
         in: query
         required: false
+        description: Include inactive products
         schema:
-          type: number
-      - name: max_price
-        in: query
-        required: false
-        schema:
-          type: number
+          type: boolean
       responses:
         '200':
           description: products found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    description:
+                      type: string
+                      nullable: true
+                    sku:
+                      type: string
+                    price:
+                      type: number
+                      format: float
+                    active:
+                      type: boolean
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
     post:
       summary: Creates a product
       tags:
@@ -425,8 +1575,31 @@ paths:
       responses:
         '201':
           description: product created
-        '401':
-          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  sku:
+                    type: string
+                  price:
+                    type: number
+                    format: float
+                  active:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
         '422':
           description: invalid request
       requestBody:
@@ -439,17 +1612,364 @@ paths:
                   type: string
                 description:
                   type: string
+                sku:
+                  type: string
                 price:
                   type: number
-                category_id:
-                  type: string
-                inventory_count:
-                  type: integer
+                  format: float
                 active:
                   type: boolean
               required:
               - name
               - price
+  "/api/v1/products/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Product ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieves a product
+      tags:
+      - Products
+      responses:
+        '200':
+          description: product found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  sku:
+                    type: string
+                  price:
+                    type: number
+                    format: float
+                  active:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                  inventory:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      quantity:
+                        type: integer
+                      low_stock_threshold:
+                        type: integer
+        '404':
+          description: product not found
+    put:
+      summary: Updates a product
+      tags:
+      - Products
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: product updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  sku:
+                    type: string
+                  price:
+                    type: number
+                    format: float
+                  active:
+                    type: boolean
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: product not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                  format: float
+                active:
+                  type: boolean
+    delete:
+      summary: Deletes a product
+      tags:
+      - Products
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: product deleted
+        '404':
+          description: product not found
+  "/api/v1/orders/{order_id}/shipments":
+    parameters:
+    - name: order_id
+      in: path
+      description: Order ID
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Lists all shipments for an order
+      tags:
+      - Shipments
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: shipments found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    order_id:
+                      type: integer
+                    tracking_number:
+                      type: string
+                      nullable: true
+                    carrier:
+                      type: string
+                      nullable: true
+                    status:
+                      type: string
+                      enum:
+                      - pending
+                      - shipped
+                      - delivered
+                      - returned
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+        '404':
+          description: order not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+    post:
+      summary: Creates a shipment for an order
+      tags:
+      - Shipments
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: shipment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  order_id:
+                    type: integer
+                  tracking_number:
+                    type: string
+                    nullable: true
+                  carrier:
+                    type: string
+                    nullable: true
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - shipped
+                    - delivered
+                    - returned
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '404':
+          description: order not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tracking_number:
+                  type: string
+                carrier:
+                  type: string
+                status:
+                  type: string
+                  enum:
+                  - pending
+                  - shipped
+                  - delivered
+                  - returned
+  "/api/v1/orders/{order_id}/shipments/{id}":
+    parameters:
+    - name: order_id
+      in: path
+      description: Order ID
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      description: Shipment ID
+      required: true
+      schema:
+        type: integer
+    put:
+      summary: Updates a shipment
+      tags:
+      - Shipments
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: shipment updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  order_id:
+                    type: integer
+                  tracking_number:
+                    type: string
+                    nullable: true
+                  carrier:
+                    type: string
+                    nullable: true
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - shipped
+                    - delivered
+                    - returned
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: shipment not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tracking_number:
+                  type: string
+                carrier:
+                  type: string
+                status:
+                  type: string
+                  enum:
+                  - pending
+                  - shipped
+                  - delivered
+                  - returned
 servers:
 - url: http://{defaultHost}
   variables:

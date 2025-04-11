@@ -1,4 +1,6 @@
 require_relative "boot"
+require_relative '../app/middleware/authentication.rb'
+require_relative '../app/middleware/request_store_middleware.rb'
 
 require "rails"
 # Pick the frameworks you want:
@@ -40,7 +42,7 @@ module DatabridgeApiGateway
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
-    
-    # We'll add middleware in initializers instead
+    config.middleware.use RequestStoreMiddleware
+    config.middleware.use ::Authentication
   end
 end
