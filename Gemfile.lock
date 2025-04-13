@@ -1,5 +1,6 @@
-PATH
-  remote: databridge_shared
+GIT
+  remote: https://github.com/Niraj22/databridge_shared
+  revision: bdf4d4c89d583f910067b670501139a78fd21557
   specs:
     databridge_shared (0.1.0)
       avro_turf (~> 1.18)
@@ -117,7 +118,7 @@ GEM
     drb (2.2.1)
     erubi (1.13.1)
     excon (0.112.0)
-    faraday (2.12.2)
+    faraday (2.13.0)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -192,7 +193,7 @@ GEM
     puma (6.6.0)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (3.1.12)
+    rack (3.1.13)
     rack-cors (2.0.2)
       rack (>= 2.0.0)
     rack-session (2.1.0)
@@ -239,9 +240,9 @@ GEM
       redis-client (>= 0.22.0)
     redis-client (0.24.0)
       connection_pool
-    reline (0.6.0)
+    reline (0.6.1)
       io-console (~> 0.5)
-    request_store (1.5.1)
+    request_store (1.7.0)
       rack (>= 1.4)
     rspec-core (3.13.3)
       rspec-support (~> 3.13.0)
@@ -295,14 +296,12 @@ GEM
     zeitwerk (2.7.2)
 
 PLATFORMS
-  aarch64-linux
   aarch64-linux-gnu
   aarch64-linux-musl
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
   x86_64-darwin
-  x86_64-linux
   x86_64-linux-gnu
   x86_64-linux-musl
 
