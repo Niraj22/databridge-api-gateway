@@ -1,6 +1,7 @@
 require_relative "boot"
 require_relative '../app/middleware/authentication.rb'
 require_relative '../app/middleware/request_store_middleware.rb'
+require_relative '../app/middleware/rate_limiter.rb'
 
 require "rails"
 # Pick the frameworks you want:
@@ -44,5 +45,8 @@ module DatabridgeApiGateway
     config.api_only = true
     config.middleware.use RequestStoreMiddleware
     config.middleware.use ::Authentication
+    config.middleware.use ::RateLimiter, 
+                          limit: ENV.fetch('RATE_LIMIT', 5).to_i,
+                          period: ENV.fetch('RATE_LIMIT_PERIOD', 60).to_i
   end
 end
