@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   web:
@@ -14,18 +14,21 @@ services:
       - bundle-volume:/usr/local/bundle
     ports:
       - '3000:3000'
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+
     links:
       - db:db
     depends_on:
       - db
+      - redis
     stdin_open: true
     tty: true
     environment:
       DB_HOST: db
       DB_PASSWORD: password
       DB_USER: postgres
+      REDIS_URL: redis://redis:6379
+      REDIS_SIDEKIQ_DB: 1
+
   db:
     image: postgres:14.5
     volumes:
@@ -37,6 +40,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_HOST_AUTH_METHOD: trust
 
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/var/lib/redis/data
+
 volumes:
   bundle-volume:
   db-volume:
+  redis-data:
